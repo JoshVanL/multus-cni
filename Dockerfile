@@ -1,3 +1,6 @@
+# NOTE: This is a fork (@joshvanl) of multus to bundle in the default CNI
+# plugins as part of the multus image.
+
 # This Dockerfile is used to build the image available on DockerHub
 FROM centos:centos7 as build
 
@@ -17,4 +20,9 @@ COPY --from=build /usr/src/multus-cni /usr/src/multus-cni
 WORKDIR /
 
 ADD ./images/entrypoint.sh /
+
+RUN mkdir -p /opt/cni/bin
+RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && yum install -y jq
+RUN curl -L https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz | tar xvz -C /opt/cni/bin/
+
 ENTRYPOINT ["/entrypoint.sh"]
